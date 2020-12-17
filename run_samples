@@ -1,0 +1,29 @@
+#!/bin/bash
+g++ -std=c++17 -O2 -Wall -Wextra -pedantic -Wshadow -Wformat=2 -Wfloat-equal -Wconversion -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align -Wno-unused-result -Wno-sign-conversion "$1.cpp" -o $1
+
+red=`tput setaf 1`
+green=`tput setaf 2`
+
+current_testcase=0
+
+test_file="${current_testcase}.in"
+#.outss .outs 
+while [ -f ${test_file} ]
+do
+    ./$1 < "${current_testcase}.in" > "${current_testcase}.outs" 
+    cat "${current_testcase}.outs" | tr -d '\n'> "fixed${current_testcase}.outs" 
+    cat "${current_testcase}.out" | tr -d " "> "${current_testcase}.outss" 
+
+    cat "fixed${current_testcase}.outs" | tr -d " "> "${current_testcase}.outs" 
+
+    rm "fixed${current_testcase}.outs"
+
+    if cmp -s "${current_testcase}.outs" "${current_testcase}.outss"; then
+        echo "${green} TEST CASE ${current_testcase} PASSED" 
+    else
+        echo "${red} TEST CASE ${current_testcase} FAILED"
+        cat "${current_testcase}.outs"  
+    fi
+    current_testcase=$((current_testcase+1))
+    test_file="${current_testcase}.in"
+done
